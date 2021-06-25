@@ -60,11 +60,11 @@ def post():
             db.session.commit()
             return jsonify({'status': 'OK. Объявление успешно добавлено!'})
         elif not validator_title_len.check_value(title):
-            return jsonify({'status': validator_title_len.message})
+            return jsonify({'status': validator_title_len.message}), 400
         elif not validator_descr_len.check_value(description):
-            return jsonify({'status': validator_descr_len.message})
+            return jsonify({'status': validator_descr_len.message}), 400
     except KeyError as ke:
-        return jsonify({'Необходимо добавить параметр': f'{ke}'})
+        return jsonify({'Необходимо добавить параметр': f'{ke}'}), 400
 
 
 @app.route('/api/v1.0/ads/<ID>',  methods=['DELETE'])  # удаляет одно объявление
@@ -77,7 +77,7 @@ def delete(ID):
         db.session.commit()
         return jsonify({'Удалено': ads.title})
     else:
-        return jsonify({'Status': 'Не удалено! Это может сделать только автор объявления'})
+        return jsonify({'Status': 'Не удалено! Это может сделать только автор объявления'}), 400
 
 
 @app.route('/api/v1.0/ads/<ID>',  methods=['PATCH'])  # изменяет одно объявление
@@ -93,7 +93,7 @@ def edit(ID):
         db.session.commit()
         return jsonify({'Обновлено': ads.title})
     else:
-        return jsonify({'Status': 'Не изменено! Это может сделать только автор объявления'})
+        return jsonify({'Status': 'Не изменено! Это может сделать только автор объявления'}), 400
 
 
 
