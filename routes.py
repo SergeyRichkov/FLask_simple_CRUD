@@ -58,7 +58,6 @@ def post():
         db.session.commit()
         return jsonify({'status': 'OK. Объявление успешно добавлено!'})
     elif not validator_title_len.check_value(title):
-
         return jsonify({'status': validator_title_len.message})
 
     elif not validator_descr_len.check_value(description):
@@ -83,7 +82,6 @@ def delete(ID):
 def edit(ID):
     current_user_id = User.query.filter_by(username=auth.current_user()).first().id
     ads = Ads.query.get_or_404(ID)
-    print(request.args.to_dict().keys())
     if ads.user_id == current_user_id:
         if "title" in request.args.to_dict().keys():
             ads.title = request.args.to_dict()['title']
@@ -107,8 +105,6 @@ def new_user():
     email = request.args.get('email')
     if not validator_email.check_value(email):
         return jsonify({'Ошибка': validator_email.message}), 400
-
-
     if username is None or password is None or email is None:
         abort(400)  # missing arguments
     if User.query.filter_by(username=username).first() is not None:
