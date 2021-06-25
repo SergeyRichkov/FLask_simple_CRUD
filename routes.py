@@ -17,10 +17,12 @@ validator_email = ValidateEmail(field=User.email, throw_exception=True,
                                 message='Неверный формат адреса электронной почты')
 
 validator_title_len = ValidateLength(field=Ads.title, throw_exception=True, min_length=2,
-                    max_length=30, message='Превышена максимальная длина заголовка')
+                    max_length=30,
+                    message="Параметр 'title' минимум 2 символа, максимум - 30 символов")
 
 validator_descr_len = ValidateLength(field=Ads.description, throw_exception=True, min_length=2,
-                    max_length=100, message='Превышена максимальная длина описания')
+                    max_length=100,
+                    message="Параметр 'description' минимум 2 символа, максимум - 100 символов")
 
 validator_username_field = ValidateLength(field=User.username, throw_exception=True,
                     min_length=2, max_length=15,
@@ -44,24 +46,25 @@ def get_all():
 @app.route('/api/v1.0/ads',  methods=['POST'])  # добавляет новое объявление
 @auth.login_required
 def post():
+    try:
+        user = auth.username()
+        user_id = User.query.filter_by(username=user).first().id
+        title = request.args.to_dict()['title']
+        description = request.args.to_dict()['description']
+        create_date = f'{datetime.now()}'
 
-    user = auth.username()
-    user_id = User.query.filter_by(username=user).first().id
-    title = request.args.to_dict()['title']
-    description = request.args.to_dict()['description']
-    create_date = f'{datetime.now()}'
-
-    if validator_title_len.check_value(title) and\
-    validator_descr_len.check_value(description):
-        ad = Ads(title=title, description=description, create_date=create_date, user_id=user_id)
-        db.session.add(ad)
-        db.session.commit()
-        return jsonify({'status': 'OK. Объявление успешно добавлено!'})
-    elif not validator_title_len.check_value(title):
-        return jsonify({'status': validator_title_len.message})
-
-    elif not validator_descr_len.check_value(description):
-        return jsonify({'status': validator_descr_len.message})
+        if validator_title_len.check_value(title) and\
+        validator_descr_len.check_value(description):
+            ad = Ads(title=title, description=description, create_date=create_date, user_id=user_id)
+            db.session.add(ad)
+            db.session.commit()
+            return jsonify({'status': 'OK. Объявление успешно добавлено!'})
+        elif not validator_title_len.check_value(title):
+            return jsonify({'status': validator_title_len.message})
+        elif not validator_descr_len.check_value(description):
+            return jsonify({'status': validator_descr_len.message})
+    except KeyError as ke:
+        return jsonify({'Необходимо добавить параметр': f'{ke}'})
 
 
 @app.route('/api/v1.0/ads/<ID>',  methods=['DELETE'])  # удаляет одно объявление
