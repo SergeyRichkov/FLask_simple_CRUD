@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from werkzeug.security import check_password_hash
@@ -119,11 +120,32 @@ def new_user():
     db.session.commit()
     return jsonify({'username': user.username}), 201
 
+#
+# @auth.verify_password
+# def verify_password(username, password):
+#     users = User.query.all()
+#     users_list = [x.username for x in users]
+#     if username in users_list and\
+#     check_password_hash(User.query.filter_by(username=username).first().password_hash, password):
+#         return username
 
 @auth.verify_password
 def verify_password(username, password):
-    users = User.query.all()
-    users_list = [x.username for x in users]
-    if username in users_list and\
-    check_password_hash(User.query.filter_by(username=username).first().password_hash, password):
+    user = User.query.filter_by(username=username).first()
+    if user and check_password_hash(user.password_hash, password):
         return username
+
+
+@app.route('/check')    #проверочный роут
+def check():
+    db_url = os.environ.get('DATABASE_URL')
+    flask_app = os.environ.get('FLASK_APP')
+
+
+
+    return jsonify({"status": "Работаем!",
+                    "db_url": f"{db_url}",
+                    "flask_app": f"{flask_app}",
+                    "VERSION": "получение адреса из переменных окружения"
+                    }
+                    ), 201
