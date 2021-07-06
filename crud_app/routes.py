@@ -9,8 +9,8 @@ from flask import jsonify, request
 from flask_validator import ValidateEmail, ValidateLength
 from flask_httpauth import HTTPBasicAuth
 
-from ads import app, db
-from models import Ads, User
+from crud_app import app, db
+from crud_app.models import User, Ads
 
 auth = HTTPBasicAuth()
 

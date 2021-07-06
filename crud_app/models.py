@@ -1,4 +1,4 @@
-from ads import db
+from crud_app import db
 
 
 class User(db.Model):
@@ -7,6 +7,7 @@ class User(db.Model):
     email = db.Column(db.String)
     password_hash = db.Column(db.String(128))
     ads = db.relationship('Ads', backref='owner')
+
 
 
 class Ads(db.Model):
